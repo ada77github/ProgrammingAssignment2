@@ -1,0 +1,52 @@
+## These functions store a matrix and cache its inverse. This should avoid 
+## the computational overhead of a new computation of the inverse in the 
+## case it was already computed.
+
+## makeCacheMatrix tis a function that akes as input a matrix "x" and creates a
+## list containing 4 funtions:
+##      set()...........sets the matrix x and sets the inverse to NULL
+##      get() ..........returns the matrix x
+##      setinverse()....sets the inverse of the matrix x
+##      getinverse()....gets the inverse of the matrix x
+makeCacheMatrix<-function(x=numeric()){
+  inv<-NULL #variable that stores the computed inverse
+  
+  set<-function(y){
+      x<<-y #sets the matrix x equal to the input matrix y
+      inv<<-NULL #clears the variable inv since x has changed
+  }
+  
+  get<-function() x #returns the matrix x
+  
+  setinverse<-function(inverse) inv<<-inverse #stores the inverse into inv
+  getinverse<-function() inv # returns the matrix inv (the inverse)
+  
+  #return a list containing the 4 functions set, get, setinverse, getinverse
+  list(set=set,get=get,setinverse=setinverse,getinverse=getinverse)
+}
+
+
+## cacheSolve is a function that takes as input a makeCacheMatrix list "x"
+## and checks whether the inverse has been stored or not. If it has been
+## stored it returns it. Otherwise it computes the inverse, stores it into "x"
+## and returns the inverse. The args ... can be used as parameters for
+## the function solve, which computes the inverse, to solve a linear system.
+cacheSolve<-function(x,...){
+    #reads the stored inverse of "x" by casting the function getinverse()
+    inv<-x$getinverse()
+    
+    #checks whether the stored matrix is null or not
+    if(!is.null(inv)){
+        #if not, it returns the stored matrix and warns the user
+        message("getting cached data")
+        return(inv)
+    } else{
+        #if yes, it computes the inverse calling solve() with the args ...
+        # and stores the solution into "x", by calling "the function setmean()
+        inv<-solve(x$get(),...)
+        x$setmean(inv)
+        
+        #finally it returns the computed matrix inv
+        return(inv)
+    }
+}
